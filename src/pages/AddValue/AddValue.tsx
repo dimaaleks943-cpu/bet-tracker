@@ -25,7 +25,7 @@ interface BetFormData {
   currency: string;
 }
 
-const AddBetForm = () => {
+const AddValue = () => {
   const [formData, setFormData] = useState<BetFormData>({
     match: "",
     status: "win",
@@ -201,4 +201,4 @@ const AddBetForm = () => {
   );
 };
 
-export default AddBetForm;
+export default AddValue;

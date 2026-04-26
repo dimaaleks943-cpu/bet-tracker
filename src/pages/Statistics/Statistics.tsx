@@ -24,7 +24,7 @@ interface IBet {
   type: string;
 }
 
-export const BalanceViewer = () => {
+export const Statistics = () => {
   const [bets, setBets] = useState<IBet[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
 
@@ -68,7 +68,7 @@ export const BalanceViewer = () => {
   }, []);
 
   return (
-    <div style={{ width: "90%", height: 800, margin: "auto", marginTop: 50 }}>
+    <div style={{ width: "90%", height: 800, margin: "auto", marginTop: 50}}>
       <h2>Прогресс баланса</h2>
       <ResponsiveContainer width="100%" height="80%">
         <LineChart data={chartData}>
