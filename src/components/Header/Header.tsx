@@ -1,4 +1,4 @@
-import { Box, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { ROUTES, ROUTE_LABELS } from "../../constants/routes.consts";
 import { ThemeMode } from "../../interfaces/theme.interface";
@@ -15,20 +15,36 @@ const NAV_ITEMS = [
 
 const THEME_TOGGLE = {
   ARIA_LABEL: "переключатель темы",
-  LIGHT_LABEL: "Светлая",
-  LIGHT_ARIA: "светлая тема",
-  DARK_LABEL: "Тёмная",
-  DARK_ARIA: "тёмная тема",
+  TO_DARK_TITLE: "Тёмная тема",
+  TO_LIGHT_TITLE: "Светлая тема",
 } as const;
 
-export const Header = () => {
-  const { mode, setMode } = useThemeMode();
+const SunIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" />
+    <path
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+    />
+  </svg>
+);
 
-  const handleThemeChange = (_: React.MouseEvent<HTMLElement>, value: ThemeMode | null) => {
-    if (value) {
-      setMode(value);
-    }
-  };
+const MoonIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M21 14.5A8.5 8.5 0 1 1 9.5 3 6.5 6.5 0 0 0 21 14.5Z"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const Header = () => {
+  const { mode, toggleTheme } = useThemeMode();
+  const isLight = mode === ThemeMode.Light;
 
   return (
     <Box
@@ -50,50 +66,45 @@ export const Header = () => {
         borderColor: "custom.border",
       }}
     >
+      <IconButton
+        onClick={toggleTheme}
+        aria-label={THEME_TOGGLE.ARIA_LABEL}
+        title={isLight ? THEME_TOGGLE.TO_DARK_TITLE : THEME_TOGGLE.TO_LIGHT_TITLE}
+        size="small"
+        sx={{
+          position: "absolute",
+          top: 12,
+          right: 16,
+          color: "text.secondary",
+          bgcolor: "custom.backgroundTertiary",
+          "&:hover": {
+            bgcolor: "custom.primarySoft",
+            color: "primary.main",
+          },
+        }}
+      >
+        {isLight ? <MoonIcon /> : <SunIcon />}
+      </IconButton>
+
       <Typography variant="h4" fontWeight={700} color="primary">
         {APP_TITLE}
       </Typography>
 
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 2,
-          flexWrap: "wrap",
-          justifyContent: "center",
-        }}
-      >
-        <Box sx={{ display: "flex", gap: "8px", flexWrap: "wrap", justifyContent: "center" }}>
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              style={({ isActive }) => ({
-                padding: "6px 14px",
-                borderRadius: 8,
-                fontWeight: isActive ? 700 : 400,
-                backgroundColor: isActive ? "rgba(51, 144, 236, 0.12)" : "transparent",
-              })}
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </Box>
-
-        <ToggleButtonGroup
-          value={mode}
-          exclusive
-          onChange={handleThemeChange}
-          size="small"
-          aria-label={THEME_TOGGLE.ARIA_LABEL}
-        >
-          <ToggleButton value={ThemeMode.Light} aria-label={THEME_TOGGLE.LIGHT_ARIA}>
-            {THEME_TOGGLE.LIGHT_LABEL}
-          </ToggleButton>
-          <ToggleButton value={ThemeMode.Dark} aria-label={THEME_TOGGLE.DARK_ARIA}>
-            {THEME_TOGGLE.DARK_LABEL}
-          </ToggleButton>
-        </ToggleButtonGroup>
+      <Box sx={{ display: "flex", gap: "8px", flexWrap: "wrap", justifyContent: "center" }}>
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            style={({ isActive }) => ({
+              padding: "6px 14px",
+              borderRadius: 8,
+              fontWeight: isActive ? 700 : 400,
+              backgroundColor: isActive ? "rgba(51, 144, 236, 0.12)" : "transparent",
+            })}
+          >
+            {item.label}
+          </NavLink>
+        ))}
       </Box>
     </Box>
   );
