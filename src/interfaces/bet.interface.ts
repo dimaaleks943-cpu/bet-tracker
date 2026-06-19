@@ -1,4 +1,5 @@
 export enum BetStatus {
+  Pending = "pending",
   Win = "win",
   Lose = "lose",
   Return = "return",
@@ -43,7 +44,10 @@ export interface ICreateBetPayload {
   odds: number;
   stake: number;
   currency: Currency;
+  date: string;
 }
+
+export interface IUpdateBetPayload extends ICreateBetPayload {}
 
 export interface BetFormData {
   match: string;
@@ -55,4 +59,18 @@ export interface BetFormData {
   odds: number | string;
   stake: number | string;
   currency: Currency;
+  date: string;
 }
+
+export const betToFormData = (bet: IBet): BetFormData => ({
+  match: bet.match,
+  status: bet.status,
+  market: bet.market,
+  payout: bet.payout,
+  sport: bet.sport,
+  type: bet.type,
+  odds: bet.odds,
+  stake: bet.stake,
+  currency: bet.currency,
+  date: bet.date ? bet.date.slice(0, 10) : new Date().toISOString().slice(0, 10),
+});

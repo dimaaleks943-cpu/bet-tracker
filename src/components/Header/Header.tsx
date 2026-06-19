@@ -1,15 +1,16 @@
 import { Box, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import { NavLink } from "react-router";
-import { ROUTES } from "../../constants/routes.consts";
+import { NavLink } from "react-router-dom";
+import { ROUTES, ROUTE_LABELS } from "../../constants/routes.consts";
 import { ThemeMode } from "../../interfaces/theme.interface";
 import { useThemeMode } from "../../hooks/useThemeMode";
 
 const APP_TITLE = "BET - Track";
 
 const NAV_ITEMS = [
-  { title: "main", label: "Главная", path: ROUTES.MAIN },
-  { title: "statistics", label: "Статистика", path: ROUTES.STATISTICS },
-  { title: "add", label: "Добавить", path: ROUTES.ADD },
+  { path: ROUTES.BETS, label: ROUTE_LABELS[ROUTES.BETS] },
+  { path: ROUTES.STATISTICS, label: ROUTE_LABELS[ROUTES.STATISTICS] },
+  { path: ROUTES.BUDGET, label: ROUTE_LABELS[ROUTES.BUDGET] },
+  { path: ROUTES.FOOTBALL, label: ROUTE_LABELS[ROUTES.FOOTBALL] },
 ] as const;
 
 const THEME_TOGGLE = {
@@ -62,9 +63,18 @@ export const Header = () => {
           justifyContent: "center",
         }}
       >
-        <Box sx={{ display: "flex", gap: "12px" }}>
+        <Box sx={{ display: "flex", gap: "8px", flexWrap: "wrap", justifyContent: "center" }}>
           {NAV_ITEMS.map((item) => (
-            <NavLink key={item.path} title={item.title} to={item.path}>
+            <NavLink
+              key={item.path}
+              to={item.path}
+              style={({ isActive }) => ({
+                padding: "6px 14px",
+                borderRadius: 8,
+                fontWeight: isActive ? 700 : 400,
+                backgroundColor: isActive ? "rgba(51, 144, 236, 0.12)" : "transparent",
+              })}
+            >
               {item.label}
             </NavLink>
           ))}
