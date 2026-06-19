@@ -1,14 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { KeyboardEvent, useCallback, useEffect, useState } from "react";
 import {
   Avatar,
   Box,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
-  SelectChangeEvent,
   Tab,
   Table,
   TableBody,
@@ -41,7 +36,8 @@ enum FootballTab {
 const FOOTBALL_LABELS = {
   TITLE: "Футбольная статистика",
   SOURCE: "Данные: football-data.org",
-  COMPETITION: "Турнир",
+  LEAGUES: "Лиги",
+  SELECT_LEAGUE: "Выберите лигу для просмотра матчей и таблицы",
   MATCHES: "Матчи",
   STANDINGS: "Таблица",
   COL_DATE: "Дата",
@@ -82,6 +78,17 @@ const formatScore = (match: IFootballMatch) => {
   return `${home} : ${away}`;
 };
 
+const handleCardKeyDown = (
+  event: KeyboardEvent<HTMLDivElement>,
+  code: string,
+  onSelect: (code: string) => void
+) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    onSelect(code);
+  }
+};
+
 export const Football = () => {
   const [tab, setTab] = useState(FootballTab.Matches);
   const [competitions, setCompetitions] = useState<IFootballCompetition[]>([]);
@@ -105,9 +112,6 @@ export const Football = () => {
       const data = await getCompetitions();
       const sorted = [...data.competitions].sort((a, b) => a.name.localeCompare(b.name));
       setCompetitions(sorted);
-      if (sorted.length > 0) {
-        setSelectedCode((prev) => prev || sorted[0].code);
-      }
     } catch (err) {
       console.error(MESSAGES.FOOTBALL_FETCH_ERROR, err);
       setError(MESSAGES.FOOTBALL_FETCH_ERROR);
@@ -169,34 +173,101 @@ export const Football = () => {
 
       {hasApiKey && (
         <>
-          <FormControl size="small" sx={{ minWidth: 280, mb: 3 }}>
-            <InputLabel>{FOOTBALL_LABELS.COMPETITION}</InputLabel>
-            <Select
-              value={selectedCode}
-              label={FOOTBALL_LABELS.COMPETITION}
-              onChange={(e: SelectChangeEvent) => setSelectedCode(e.target.value)}
-              disabled={isLoadingCompetitions}
-            >
-              {competitions.map((comp) => (
-                <MenuItem key={comp.code} value={comp.code}>
-                  {comp.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+            {FOOTBALL_LABELS.LEAGUES}
+          </Typography>
 
-          <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
-            <Tab label={FOOTBALL_LABELS.MATCHES} />
-            <Tab label={FOOTBALL_LABELS.STANDINGS} />
-          </Tabs>
-
-          {isLoadingData ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+          {isLoadingCompetitions ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
               <CircularProgress />
             </Box>
           ) : (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+                gap: 2,
+                mb: 4,
+              }}
+            >
+              {competitions.map((comp) => {
+                const isSelected = comp.code === selectedCode;
+
+                return (
+                  <Paper
+                    key={comp.code}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={isSelected}
+                    aria-label={comp.name}
+                    onClick={() => setSelectedCode(comp.code)}
+                    onKeyDown={(event) => handleCardKeyDown(event, comp.code, setSelectedCode)}
+                    sx={{
+                      p: 2,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 1,
+                      cursor: "pointer",
+                      border: 2,
+                      borderColor: isSelected ? "primary.main" : "custom.border",
+                      bgcolor: isSelected ? "custom.primarySoft" : "background.paper",
+                      transition: "border-color 0.2s, background-color 0.2s",
+                      "&:hover": {
+                        borderColor: "primary.main",
+                      },
+                      "&:focus-visible": {
+                        outline: 2,
+                        outlineColor: "primary.main",
+                        outlineOffset: 2,
+                      },
+                    }}
+                  >
+                    <Avatar
+                      src={comp.emblem}
+                      alt={comp.name}
+                      variant="rounded"
+                      sx={{ width: 56, height: 56, bgcolor: "background.default" }}
+                    />
+                    <Typography
+                      variant="body2"
+                      fontWeight={600}
+                      align="center"
+                      sx={{ lineHeight: 1.3 }}
+                    >
+                      {comp.name}
+                    </Typography>
+                    {comp.area?.name && (
+                      <Typography variant="caption" color="text.secondary" align="center">
+                        {comp.area.name}
+                      </Typography>
+                    )}
+                  </Paper>
+                );
+              })}
+            </Box>
+          )}
+
+          {!selectedCode && !isLoadingCompetitions && competitions.length > 0 && (
+            <Typography color="text.secondary" sx={{ mb: 3 }}>
+              {FOOTBALL_LABELS.SELECT_LEAGUE}
+            </Typography>
+          )}
+
+          {selectedCode && (
             <>
-              <TabPanel value={tab} index={FootballTab.Matches}>
+              <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
+                <Tab label={FOOTBALL_LABELS.MATCHES} />
+                <Tab label={FOOTBALL_LABELS.STANDINGS} />
+              </Tabs>
+
+              {isLoadingData ? (
+                <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+                  <CircularProgress />
+                </Box>
+              ) : (
+                <>
+                  <TabPanel value={tab} index={FootballTab.Matches}>
                 {matches.length === 0 ? (
                   <Typography color="text.secondary">{FOOTBALL_LABELS.NO_MATCHES}</Typography>
                 ) : (
@@ -279,7 +350,9 @@ export const Football = () => {
                     </Table>
                   </TableContainer>
                 )}
-              </TabPanel>
+                  </TabPanel>
+                </>
+              )}
             </>
           )}
         </>

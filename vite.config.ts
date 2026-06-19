@@ -4,4 +4,13 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      "/football-api": {
+        target: "https://api.football-data.org",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/football-api/, "/v4"),
+      },
+    },
+  },
 })
