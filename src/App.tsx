@@ -1,26 +1,22 @@
 import "./App.css";
 import { Box } from "@mui/material";
-import {Header} from "./componets/Header/Header.tsx";
-import {Main} from "./pages/Main/Main.tsx";
-import { Routes, Route } from 'react-router-dom';
-import {Statistics} from "./pages/Statistics/Statistics.tsx";
-import AddValue from "./pages/AddValue/AddValue.tsx";
-
+import { Header } from "./components/Header/Header";
+import { Main } from "./pages/Main/Main";
+import { Routes, Route } from "react-router-dom";
+import { Statistics } from "./pages/Statistics/Statistics";
+import { AddValue } from "./pages/AddValue/AddValue";
+import { ROUTES } from "./constants/routes.consts";
 
 function App() {
-
-
   return (
-      <Box>
-        <Header/>
-          <Routes>
-              <Route path="/" element={<Main/>} />
-              <Route path="/statistics" element={<Statistics/>} />
-              <Route path="/add" element={<AddValue/>} />
-          </Routes>
-      </Box>
-
-
+    <Box>
+      <Header />
+      <Routes>
+        <Route path={ROUTES.MAIN} element={<Main />} />
+        <Route path={ROUTES.STATISTICS} element={<Statistics />} />
+        <Route path={ROUTES.ADD} element={<AddValue />} />
+      </Routes>
+    </Box>
   );
 }
 

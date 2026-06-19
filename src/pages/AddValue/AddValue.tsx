@@ -1,5 +1,4 @@
 import { useState, ChangeEvent, FormEvent } from "react";
-import axios from "axios";
 import {
   Box,
   Button,
@@ -11,48 +10,25 @@ import {
   FormControl,
   InputLabel,
   Stack,
+  SelectChangeEvent,
 } from "@mui/material";
+import { createBet } from "../../api/bets.api";
+import { BetFormData } from "./addValue.interface";
+import { DEFAULT_BET_FORM_DATA } from "./addValue.consts";
 
-interface BetFormData {
-  match: string;
-  status: "win" | "lose" | "return" | "cashed_out";
-  market: string;
-  payout: number | string;
-  sport: "football" | "esports" | "hockey";
-  type: string;
-  odds: number | string;
-  stake: number | string;
-  currency: string;
-}
+export const AddValue = () => {
+  const [formData, setFormData] = useState<BetFormData>(DEFAULT_BET_FORM_DATA);
 
-const AddValue = () => {
-  const [formData, setFormData] = useState<BetFormData>({
-    match: "",
-    status: "win",
-    market: "",
-    payout: "",
-    sport: "football",
-    type: "single",
-    odds: "",
-    stake: "",
-    currency: "BYN",
-  });
-
-  // Обработка изменений в инпутах
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }>
-  ) => {
-    const { name, value } = e.target;
+  const updateFormData = (name: string, value: string) => {
     setFormData((prev) => {
-      const updated = { ...prev, [name as string]: value };
+      const updated = { ...prev, [name]: value };
 
-      // Автоматический расчет payout (если есть ставка и коэффициент)
       if (name === "stake" || name === "odds") {
         const stake = parseFloat(
-          name === "stake" ? (value as string) : (updated.stake as string)
+          name === "stake" ? value : (updated.stake as string)
         );
         const odds = parseFloat(
-          name === "odds" ? (value as string) : (updated.odds as string)
+          name === "odds" ? value : (updated.odds as string)
         );
         if (!isNaN(stake) && !isNaN(odds)) {
           updated.payout = (stake * odds).toFixed(2);
@@ -60,6 +36,16 @@ const AddValue = () => {
       }
       return updated;
     });
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    updateFormData(name, value);
+  };
+
+  const handleSelectChange = (e: SelectChangeEvent) => {
+    const { name, value } = e.target;
+    updateFormData(name, value);
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -72,20 +58,10 @@ const AddValue = () => {
         stake: parseFloat(formData.stake as string),
       };
 
-      const res = await axios.post("http://127.0.0.1:8000/bets/", payload);
-      alert(`✅ Запись добавлена! ID: ${res.data.id}`);
+      const res = await createBet(payload);
+      alert(`✅ Запись добавлена! ID: ${res.id}`);
 
-      setFormData({
-        match: "",
-        status: "win",
-        market: "",
-        payout: "",
-        sport: "football",
-        type: "single",
-        odds: "",
-        stake: "",
-        currency: "BYN",
-      });
+      setFormData(DEFAULT_BET_FORM_DATA);
     } catch (error) {
       console.error(error);
       alert("❌ Ошибка при добавлении записи");
@@ -114,7 +90,7 @@ const AddValue = () => {
             label="Матч"
             name="match"
             value={formData.match}
-            onChange={handleChange}
+            onChange={handleInputChange}
             required
             fullWidth
           />
@@ -123,7 +99,7 @@ const AddValue = () => {
             label="Рынок (например: Winner: P1)"
             name="market"
             value={formData.market}
-            onChange={handleChange}
+            onChange={handleInputChange}
             fullWidth
           />
 
@@ -133,7 +109,7 @@ const AddValue = () => {
               name="status"
               value={formData.status}
               label="Статус"
-              onChange={handleChange}
+              onChange={handleSelectChange}
             >
               <MenuItem value="win">win</MenuItem>
               <MenuItem value="lose">lose</MenuItem>
@@ -148,7 +124,7 @@ const AddValue = () => {
             type="number"
             inputProps={{ step: "0.01" }}
             value={formData.odds}
-            onChange={handleChange}
+            onChange={handleInputChange}
             required
           />
 
@@ -158,7 +134,7 @@ const AddValue = () => {
             type="number"
             inputProps={{ step: "0.01" }}
             value={formData.stake}
-            onChange={handleChange}
+            onChange={handleInputChange}
             required
           />
 
@@ -168,7 +144,7 @@ const AddValue = () => {
             type="number"
             inputProps={{ step: "0.01" }}
             value={formData.payout}
-            onChange={handleChange}
+            onChange={handleInputChange}
             required
           />
 
@@ -178,7 +154,7 @@ const AddValue = () => {
               name="sport"
               value={formData.sport}
               label="Спорт"
-              onChange={handleChange}
+              onChange={handleSelectChange}
             >
               <MenuItem value="football">football</MenuItem>
               <MenuItem value="esports">esports</MenuItem>
@@ -200,5 +176,3 @@ const AddValue = () => {
     </Paper>
   );
 };
-
-export default AddValue;
