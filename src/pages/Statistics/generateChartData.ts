@@ -1,5 +1,12 @@
-import { IBet } from "../../interfaces/bet.interface";
-import { IChartDataPoint } from "./statistics.interface";
+import { BetStatus, IBet } from "../../interfaces/bet.interface";
+
+export interface IChartDataPoint {
+  name: string;
+  balance: number;
+  event: string;
+  market: string;
+  stake: number;
+}
 
 export const generateChartData = (bets: IBet[]): IChartDataPoint[] => {
   let balance = 0;
@@ -7,11 +14,11 @@ export const generateChartData = (bets: IBet[]): IChartDataPoint[] => {
   return bets.map((bet) => {
     let profit = 0;
 
-    if (bet.status === "win" || bet.status === "cashed_out") {
+    if (bet.status === BetStatus.Win || bet.status === BetStatus.CashedOut) {
       profit = bet.payout - bet.stake;
-    } else if (bet.status === "lose") {
+    } else if (bet.status === BetStatus.Lose) {
       profit = -bet.stake;
-    } else if (bet.status === "return") {
+    } else if (bet.status === BetStatus.Return) {
       profit = 0;
     }
 

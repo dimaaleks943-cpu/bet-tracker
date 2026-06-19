@@ -1,8 +1,24 @@
 import { Box, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { NavLink } from "react-router";
 import { ROUTES } from "../../constants/routes.consts";
-import { useThemeMode } from "../../hooks/useThemeMode";
 import { ThemeMode } from "../../interfaces/theme.interface";
+import { useThemeMode } from "../../hooks/useThemeMode";
+
+const APP_TITLE = "BET - Track";
+
+const NAV_ITEMS = [
+  { title: "main", label: "Главная", path: ROUTES.MAIN },
+  { title: "statistics", label: "Статистика", path: ROUTES.STATISTICS },
+  { title: "add", label: "Добавить", path: ROUTES.ADD },
+] as const;
+
+const THEME_TOGGLE = {
+  ARIA_LABEL: "переключатель темы",
+  LIGHT_LABEL: "Светлая",
+  LIGHT_ARIA: "светлая тема",
+  DARK_LABEL: "Тёмная",
+  DARK_ARIA: "тёмная тема",
+} as const;
 
 export const Header = () => {
   const { mode, setMode } = useThemeMode();
@@ -34,7 +50,7 @@ export const Header = () => {
       }}
     >
       <Typography variant="h4" fontWeight={700} color="primary">
-        BET - Track
+        {APP_TITLE}
       </Typography>
 
       <Box
@@ -47,15 +63,11 @@ export const Header = () => {
         }}
       >
         <Box sx={{ display: "flex", gap: "12px" }}>
-          <NavLink title="main" to={ROUTES.MAIN}>
-            Главная
-          </NavLink>
-          <NavLink title="statistics" to={ROUTES.STATISTICS}>
-            Статистика
-          </NavLink>
-          <NavLink title="add" to={ROUTES.ADD}>
-            Добавить
-          </NavLink>
+          {NAV_ITEMS.map((item) => (
+            <NavLink key={item.path} title={item.title} to={item.path}>
+              {item.label}
+            </NavLink>
+          ))}
         </Box>
 
         <ToggleButtonGroup
@@ -63,13 +75,13 @@ export const Header = () => {
           exclusive
           onChange={handleThemeChange}
           size="small"
-          aria-label="переключатель темы"
+          aria-label={THEME_TOGGLE.ARIA_LABEL}
         >
-          <ToggleButton value="light" aria-label="светлая тема">
-            Светлая
+          <ToggleButton value={ThemeMode.Light} aria-label={THEME_TOGGLE.LIGHT_ARIA}>
+            {THEME_TOGGLE.LIGHT_LABEL}
           </ToggleButton>
-          <ToggleButton value="dark" aria-label="тёмная тема">
-            Тёмная
+          <ToggleButton value={ThemeMode.Dark} aria-label={THEME_TOGGLE.DARK_ARIA}>
+            {THEME_TOGGLE.DARK_LABEL}
           </ToggleButton>
         </ToggleButtonGroup>
       </Box>

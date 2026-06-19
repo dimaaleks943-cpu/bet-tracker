@@ -7,11 +7,13 @@ import { Statistics } from "./pages/Statistics/Statistics";
 import { AddValue } from "./pages/AddValue/AddValue";
 import { ROUTES } from "./constants/routes.consts";
 
+const HEADER_OFFSET_PT = "110px";
+
 function App() {
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
       <Header />
-      <Box component="main" sx={{ pt: "110px", px: 2, pb: 4 }}>
+      <Box component="main" sx={{ pt: HEADER_OFFSET_PT, px: 2, pb: 4 }}>
         <Routes>
           <Route path={ROUTES.MAIN} element={<Main />} />
           <Route path={ROUTES.STATISTICS} element={<Statistics />} />

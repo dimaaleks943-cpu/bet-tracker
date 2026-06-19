@@ -1,11 +1,9 @@
 import { createTheme } from "@mui/material";
-import { LIGHT_THEME } from "../constants/color/lightTheme.consts";
-import { DARK_THEME } from "../constants/color/darkTheme.consts";
-import { SEMANTIC_COLORS } from "../constants/color/semantic.consts";
 import { ThemeMode } from "../interfaces/theme.interface";
+import { DARK_THEME, LIGHT_THEME, SEMANTIC_COLORS } from "../constants/color/color.consts";
 
 export const createAppTheme = (mode: ThemeMode) => {
-  const tokens = mode === "light" ? LIGHT_THEME : DARK_THEME;
+  const tokens = mode === ThemeMode.Light ? LIGHT_THEME : DARK_THEME;
 
   return createTheme({
     palette: {

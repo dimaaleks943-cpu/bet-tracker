@@ -88,12 +88,14 @@ api/
 
 **Правила:**
 - Имя файла: `entity.interface.ts` (например, `bet.interface.ts`).
-- Интерфейсы, используемые только на одной странице или в одном компоненте, хранятся локально в папке страницы/компонента.
+- Enum, интерфейсы и типы одной сущности — в одном файле.
+- Интерфейсы, используемые только в одном файле, хранятся вместе с ним (компонент, хелпер).
 
 **Пример:**
 ```
 interfaces/
-└── bet.interface.ts
+├── bet.interface.ts    # enum + интерфейсы ставки
+└── theme.interface.ts  # ThemeMode + MUI-расширения
 ```
 
 ---
@@ -108,9 +110,13 @@ interfaces/
 **Пример:**
 ```
 constants/
-├── api.consts.ts
-└── routes.consts.ts
+├── color/
+│   └── color.consts.ts
+├── routes.consts.ts
+└── messages.consts.ts
 ```
+
+Подробные правила по цветам, константам и enum — в [PROJECT_RULES.md](./PROJECT_RULES.md).
 
 ---
 

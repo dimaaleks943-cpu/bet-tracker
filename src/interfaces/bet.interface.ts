@@ -1,5 +1,23 @@
-export type BetStatus = "win" | "lose" | "return" | "cashed_out";
-export type BetSport = "football" | "esports" | "hockey";
+export enum BetStatus {
+  Win = "win",
+  Lose = "lose",
+  Return = "return",
+  CashedOut = "cashed_out",
+}
+
+export enum BetSport {
+  Football = "football",
+  Esports = "esports",
+  Hockey = "hockey",
+}
+
+export enum BetType {
+  Single = "single",
+}
+
+export enum Currency {
+  BYN = "BYN",
+}
 
 export interface IBet {
   id: number;
@@ -10,8 +28,8 @@ export interface IBet {
   stake: number;
   payout: number;
   sport: BetSport;
-  type: string;
-  currency: string;
+  type: BetType;
+  currency: Currency;
   date: string;
 }
 
@@ -21,8 +39,20 @@ export interface ICreateBetPayload {
   market: string;
   payout: number;
   sport: BetSport;
-  type: string;
+  type: BetType;
   odds: number;
   stake: number;
-  currency: string;
+  currency: Currency;
+}
+
+export interface BetFormData {
+  match: string;
+  status: BetStatus;
+  market: string;
+  payout: number | string;
+  sport: BetSport;
+  type: BetType;
+  odds: number | string;
+  stake: number | string;
+  currency: Currency;
 }

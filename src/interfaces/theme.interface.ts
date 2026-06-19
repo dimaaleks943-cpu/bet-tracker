@@ -1,4 +1,7 @@
-export type ThemeMode = "light" | "dark";
+export enum ThemeMode {
+  Light = "light",
+  Dark = "dark",
+}
 
 declare module "@mui/material/styles" {
   interface Palette {
