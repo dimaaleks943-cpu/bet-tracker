@@ -74,10 +74,12 @@ export const AddValue = () => {
       sx={{
         maxWidth: 480,
         mx: "auto",
-        mt: 8,
+        mt: 4,
         p: 4,
         borderRadius: 3,
-        backgroundColor: "#fafafa",
+        bgcolor: "background.paper",
+        border: 1,
+        borderColor: "custom.border",
       }}
     >
       <Typography variant="h5" fontWeight={600} gutterBottom>

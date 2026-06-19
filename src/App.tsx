@@ -9,13 +9,15 @@ import { ROUTES } from "./constants/routes.consts";
 
 function App() {
   return (
-    <Box>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
       <Header />
-      <Routes>
-        <Route path={ROUTES.MAIN} element={<Main />} />
-        <Route path={ROUTES.STATISTICS} element={<Statistics />} />
-        <Route path={ROUTES.ADD} element={<AddValue />} />
-      </Routes>
+      <Box component="main" sx={{ pt: "110px", px: 2, pb: 4 }}>
+        <Routes>
+          <Route path={ROUTES.MAIN} element={<Main />} />
+          <Route path={ROUTES.STATISTICS} element={<Statistics />} />
+          <Route path={ROUTES.ADD} element={<AddValue />} />
+        </Routes>
+      </Box>
     </Box>
   );
 }
