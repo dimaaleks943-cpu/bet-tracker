@@ -28,7 +28,7 @@ import {
   BET_STATUS_LABELS,
   MESSAGES,
 } from "../../constants/messages.consts";
-import { BetSport, BetStatus, Currency, IBet } from "../../interfaces/bet.interface";
+import { BetSport, BetStatus, Currency, formatBetTeams, IBet } from "../../interfaces/bet.interface";
 import { calculateBetProfit } from "../../utils/calculateBetProfit";
 
 const BETS_LABELS = {
@@ -93,7 +93,8 @@ export const Bets = () => {
 
   const filteredBets = useMemo(() => {
     return bets.filter((bet) => {
-      const matchesSearch = bet.match.toLowerCase().includes(search.toLowerCase());
+      const teamsLabel = formatBetTeams(bet).toLowerCase();
+      const matchesSearch = teamsLabel.includes(search.toLowerCase());
       const matchesStatus = statusFilter === "all" || bet.status === statusFilter;
       const matchesSport = sportFilter === "all" || bet.sport === sportFilter;
       return matchesSearch && matchesStatus && matchesSport;
@@ -221,7 +222,7 @@ export const Bets = () => {
                 return (
                   <TableRow key={bet.id} hover>
                     <TableCell>{formatDate(bet.date)}</TableCell>
-                    <TableCell>{bet.match}</TableCell>
+                    <TableCell>{formatBetTeams(bet)}</TableCell>
                     <TableCell>{bet.market}</TableCell>
                     <TableCell align="right">{bet.odds}</TableCell>
                     <TableCell align="right">

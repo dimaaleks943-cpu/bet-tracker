@@ -22,7 +22,8 @@ export enum Currency {
 
 export interface IBet {
   id: number;
-  match: string;
+  team1: string;
+  team2: string;
   market: string;
   status: BetStatus;
   odds: number;
@@ -35,7 +36,8 @@ export interface IBet {
 }
 
 export interface ICreateBetPayload {
-  match: string;
+  team1: string;
+  team2: string;
   status: BetStatus;
   market: string;
   payout: number;
@@ -50,7 +52,8 @@ export interface ICreateBetPayload {
 export interface IUpdateBetPayload extends ICreateBetPayload {}
 
 export interface BetFormData {
-  match: string;
+  team1: string;
+  team2: string;
   status: BetStatus;
   market: string;
   payout: number | string;
@@ -62,8 +65,12 @@ export interface BetFormData {
   date: string;
 }
 
+export const formatBetTeams = (bet: Pick<IBet, "team1" | "team2">): string =>
+  `${bet.team1} — ${bet.team2}`;
+
 export const betToFormData = (bet: IBet): BetFormData => ({
-  match: bet.match,
+  team1: bet.team1,
+  team2: bet.team2,
   status: bet.status,
   market: bet.market,
   payout: bet.payout,

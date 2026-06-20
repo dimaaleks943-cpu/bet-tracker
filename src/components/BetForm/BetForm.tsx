@@ -1,5 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import {
+  Autocomplete,
   Box,
   Button,
   FormControl,
@@ -11,6 +12,7 @@ import {
   TextField,
 } from "@mui/material";
 import { createBet, updateBet } from "../../api/bets.api";
+import { getTeams } from "../../api/teams.api";
 import {
   BetFormData,
   BetSport,
@@ -23,7 +25,8 @@ import {
 import { MESSAGES, BET_STATUS_LABELS, BET_SPORT_LABELS } from "../../constants/messages.consts";
 
 enum BetFormField {
-  Match = "match",
+  Team1 = "team1",
+  Team2 = "team2",
   Market = "market",
   Status = "status",
   Odds = "odds",
@@ -54,7 +57,8 @@ const BET_SPORT_OPTIONS = [
 ] as const;
 
 const BET_FORM_LABELS = {
-  MATCH: "Матч",
+  TEAM1: "Команда 1",
+  TEAM2: "Команда 2",
   MARKET: "Рынок (например: Winner: P1)",
   STATUS: "Статус",
   ODDS: "Коэффициент (odds)",
@@ -68,7 +72,8 @@ const BET_FORM_LABELS = {
 } as const;
 
 export const DEFAULT_BET_FORM_DATA: BetFormData = {
-  match: "",
+  team1: "",
+  team2: "",
   status: BetStatus.Pending,
   market: "",
   payout: "",
@@ -79,6 +84,11 @@ export const DEFAULT_BET_FORM_DATA: BetFormData = {
   currency: Currency.BYN,
   date: new Date().toISOString().slice(0, 10),
 };
+
+const resetFieldsBelowSport = (sport: BetSport): BetFormData => ({
+  ...DEFAULT_BET_FORM_DATA,
+  sport,
+});
 
 const calculatePayout = (stake: number, odds: number, status: BetStatus): string => {
   if (status === BetStatus.Lose) {
@@ -105,10 +115,37 @@ export const BetForm = ({ bet, onSuccess, onCancel }: BetFormProps) => {
     bet ? betToFormData(bet) : DEFAULT_BET_FORM_DATA
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [footballTeamNames, setFootballTeamNames] = useState<string[]>([]);
+
+  const isFootball = formData.sport === BetSport.Football;
 
   useEffect(() => {
     setFormData(bet ? betToFormData(bet) : DEFAULT_BET_FORM_DATA);
   }, [bet]);
+
+  useEffect(() => {
+    if (!isFootball) {
+      setFootballTeamNames([]);
+      return;
+    }
+
+    let isCancelled = false;
+
+    getTeams()
+      .then((teams) => {
+        if (isCancelled) {
+          return;
+        }
+        setFootballTeamNames(teams.map((team) => team.name));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isFootball]);
 
   const updateFormData = (name: string, value: string) => {
     setFormData((prev) => {
@@ -142,6 +179,11 @@ export const BetForm = ({ bet, onSuccess, onCancel }: BetFormProps) => {
     updateFormData(name, value);
   };
 
+  const handleSportChange = (e: SelectChangeEvent) => {
+    const sport = e.target.value as BetSport;
+    setFormData(resetFieldsBelowSport(sport));
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -171,17 +213,56 @@ export const BetForm = ({ bet, onSuccess, onCancel }: BetFormProps) => {
     }
   };
 
+  const renderTeamField = (field: BetFormField.Team1 | BetFormField.Team2, label: string) => {
+    if (isFootball) {
+      const value = formData[field];
+
+      return (
+        <Autocomplete
+          freeSolo
+          options={footballTeamNames}
+          inputValue={value}
+          onInputChange={(_, newValue) => updateFormData(field, newValue)}
+          renderInput={(params) => (
+            <TextField {...params} label={label} required fullWidth />
+          )}
+        />
+      );
+    }
+
+    return (
+      <TextField
+        label={label}
+        name={field}
+        value={formData[field]}
+        onChange={handleInputChange}
+        required
+        fullWidth
+      />
+    );
+  };
+
   return (
     <Box component="form" onSubmit={handleSubmit}>
       <Stack spacing={2.5}>
-        <TextField
-          label={BET_FORM_LABELS.MATCH}
-          name={BetFormField.Match}
-          value={formData.match}
-          onChange={handleInputChange}
-          required
-          fullWidth
-        />
+        <FormControl fullWidth>
+          <InputLabel>{BET_FORM_LABELS.SPORT}</InputLabel>
+          <Select
+            name={BetFormField.Sport}
+            value={formData.sport}
+            label={BET_FORM_LABELS.SPORT}
+            onChange={handleSportChange}
+          >
+            {BET_SPORT_OPTIONS.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        {renderTeamField(BetFormField.Team1, BET_FORM_LABELS.TEAM1)}
+        {renderTeamField(BetFormField.Team2, BET_FORM_LABELS.TEAM2)}
 
         <TextField
           label={BET_FORM_LABELS.MARKET}
@@ -250,22 +331,6 @@ export const BetForm = ({ bet, onSuccess, onCancel }: BetFormProps) => {
           required
           fullWidth
         />
-
-        <FormControl fullWidth>
-          <InputLabel>{BET_FORM_LABELS.SPORT}</InputLabel>
-          <Select
-            name={BetFormField.Sport}
-            value={formData.sport}
-            label={BET_FORM_LABELS.SPORT}
-            onChange={handleSelectChange}
-          >
-            {BET_SPORT_OPTIONS.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
 
         <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ pt: 1 }}>
           {onCancel && (

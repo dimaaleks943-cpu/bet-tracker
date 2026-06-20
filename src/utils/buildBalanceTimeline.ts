@@ -1,4 +1,4 @@
-import { BetStatus, IBet } from "../interfaces/bet.interface";
+import { BetStatus, formatBetTeams, IBet } from "../interfaces/bet.interface";
 import { ITransaction, TransactionType } from "../interfaces/budget.interface";
 import { calculateBetProfit, calculateBettingProfit } from "./calculateBetProfit";
 
@@ -30,7 +30,7 @@ export const buildBalanceTimeline = (
       date: bet.date,
       label: `#${bet.id}`,
       eventType: "bet",
-      description: bet.match,
+      description: formatBetTeams(bet),
       detail: `${bet.market} · ${bet.stake} ${bet.currency}`,
     });
   });
